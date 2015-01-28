@@ -19,15 +19,6 @@ it is not recommended for use in a production environment.
 
 Note that this plugin depends on [MailChimp for WordPress](https://mc4wp.com/) to work, so you will need to install that plugin first.
 
-Usage
-------
-
-Using this plugin is simple. Just install it, configure some settings and you're good to go. There are a few tricks as well.
-
-```html
-<a href="javascript:MailChimpTopBar.toggle()">Toggle Bar</a> 
-```
-
 
 Bugs
 ----
