@@ -1,5 +1,7 @@
 (function($) {
 
+	var $body = $("body");
+
 	/**
 	 * Creates a new Top Bar from an element
 	 *
@@ -22,13 +24,23 @@
 		 *
 		 * @returns {boolean}
 		 */
-		function show() {
+		function show( manual ) {
 			if( $bar.is( ':animated' ) || visible ) {
 				return false;
 			}
 
-			$bar.slideDown();
-			eraseCookie( 'mctb_bar_hidden' );
+			if( manual ) {
+				// Add bar height to <body> padding
+				var bodyPadding = parseFloat( $("body").css('padding-top') ) + $bar.outerHeight();
+				$body.animate({ 'padding-top': bodyPadding });
+				$bar.slideDown();
+				eraseCookie( 'mctb_bar_hidden' );
+			} else {
+				// Add bar height to <body> padding
+				$body.css( 'padding-top', parseFloat( $("body").css('padding-top') ) + $bar.outerHeight() );
+				$bar.show();
+			}
+
 			$icon.html(config.icons.hide);
 			visible = true;
 
@@ -40,14 +52,21 @@
 		 *
 		 * @returns {boolean}
 		 */
-		function hide() {
+		function hide(manual) {
 			if( $bar.is( ':animated' ) || ! visible ) {
 				return false;
 			}
 
-			$bar.slideUp();
+			if( manual ) {
+				$bar.slideUp();
+				$body.animate({ 'padding-top': 0 });
+				createCookie( "mctb_bar_hidden", 1, config.cookieLength );
+			} else {
+				$bar.hide();
+				$body.css('padding-top', 0);
+			}
+
 			visible = false;
-			createCookie( "mctb_bar_hidden", 1, config.cookieLength );
 			$icon.html(config.icons.show);
 
 			return true;
@@ -59,23 +78,19 @@
 		 * @returns {boolean}
 		 */
 		function toggle() {
-			return visible ? hide() : show();
+			return visible ? hide(true) : show(true);
 		}
 
 		// Code to run upon object instantiation
 
-		// Move element to begin of <body>
-		$wrapper.insertBefore( document.body.firstChild );
+		// Show the bar straight away?
+		if( readCookie( "mctb_bar_hidden" ) != 1 ) {
+			show()
+		}
+
 
 		// Listen to `click` events on the icon
 		$icon.click( toggle );
-
-		// Show the bar straight away?
-		if( readCookie( "mctb_bar_hidden" ) != 1 ) {
-			$bar.show();
-			visible = true;
-			$icon.html( config.icons.hide );
-		}
 
 		// Return values
 		return {
