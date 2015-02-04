@@ -1,0 +1,127 @@
+// Calculates paddings * heights for the various bar sizes
+@mixin bar-size( $base_size ) {
+
+	font-size: $base_size * 2.5;
+
+	.mctp-bar {
+		padding: ($base_size * 1.25) ($base_size * 1.5);
+	}
+
+	.mctp-button {
+		padding: $base_size ($base_size * 3);
+	}
+
+	input {
+		padding: $base_size ($base_size * 1.5);
+	}
+
+	label {
+		font-size: $base_size * 3;
+	}
+
+	.mctp-close {
+		font-size: $base_size * 4;
+		line-height: 200%;
+	}
+}
+
+body {
+	position: relative;
+}
+
+#mailchimp-top-bar {
+
+	position: relative;
+	width: 100%;
+	margin: 0;
+	z-index: 1000;
+	display: block;
+	background: transparent;
+
+	&.mctp-sticky {
+		position: fixed;
+		left: 0;
+		right: 0;
+	}
+	// Reset Form elements, many themes apply basic styling
+	form,
+	input,
+	label {
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		vertical-align: middle;
+		margin: 0;
+		padding: 0;
+		box-shadow: none;
+		text-shadow: none;
+		font-size: 100%;
+		outline: 0;
+		height: auto;
+		line-height: initial;
+	}
+
+	form{
+		text-align: center;
+	}
+
+	// Make label & field appear inline
+	label {
+		margin: 0 6px 0 0;
+		display: inline-block;
+	}
+
+	input{
+		display: inline-block;
+		margin: 0 0 0 6px;
+		border: 1px solid white;
+		background: white;
+	}
+
+	.mctp-email {
+		width: 240px;
+	}
+
+	.mctp-button {
+		cursor: pointer;
+	}
+
+	.mctp-url {
+		display: none !important;
+	}
+
+	.mctp-close{
+		position: absolute;
+		top: 0;
+		right: 12px;
+		color: #666;
+		opacity: 0.5;
+		filter: alpha(opacity=50);
+		cursor: pointer;
+	}
+
+	.mctp-close:hover {
+		opacity: 1;
+		filter: alpha(opacity=100);
+	}
+
+
+	/**
+	* Bar Sizes
+	*/
+
+	// Small Bar
+	&.mctp-small {
+		@include bar-size(4px);
+	}
+
+	// Medium Bar
+	&.mctp-medium {
+		@include bar-size(5px);
+	}
+
+	// Big Bar
+	&.mctp-big {
+		@include bar-size(6px);
+	}
+}
