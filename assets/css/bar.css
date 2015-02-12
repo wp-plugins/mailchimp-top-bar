@@ -34,6 +34,7 @@ body {
   outline: 0;
   height: auto;
   line-height: initial;
+  float: none;
 }
 #mailchimp-top-bar form {
   text-align: center;
@@ -65,6 +66,8 @@ body {
   opacity: 0.5;
   filter: alpha(opacity=50);
   cursor: pointer;
+  display: table-cell;
+  vertical-align: middle;
 }
 #mailchimp-top-bar .mctp-close:hover {
   opacity: 1;
@@ -88,8 +91,6 @@ body {
 }
 #mailchimp-top-bar.mctp-small .mctp-close {
   font-size: 16px;
-  display: table-cell;
-  vertical-align: middle;
   top: 4px;
 }
 #mailchimp-top-bar.mctp-medium {
@@ -110,8 +111,6 @@ body {
 }
 #mailchimp-top-bar.mctp-medium .mctp-close {
   font-size: 20px;
-  display: table-cell;
-  vertical-align: middle;
   top: 5px;
 }
 #mailchimp-top-bar.mctp-big {
@@ -132,8 +131,6 @@ body {
 }
 #mailchimp-top-bar.mctp-big .mctp-close {
   font-size: 24px;
-  display: table-cell;
-  vertical-align: middle;
   top: 6px;
 }
 
