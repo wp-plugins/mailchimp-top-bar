@@ -61,8 +61,20 @@ class Bar {
 
 		// todo: add logic to hide bar on certain selected pages
 
-		// allow developers to hide bar
-		return apply_filters( 'mctp_show_bar', true );
+		/**
+		 * @deprecated 1.1
+		 * @use `mctb_show_bar`
+		 */
+		$return = apply_filters( 'mctp_show_bar', true );
+
+
+		/**
+		 * @filter `mctb_show_bar`
+		 * @expects boolean
+		 *
+		 * Set to true if the bar should be loaded for this request, false if not.
+		 */
+		return apply_filters( 'mctb_show_bar', $return );
 	}
 
 	/**
@@ -70,6 +82,7 @@ class Bar {
 	 */
 	public function add_hooks() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'load_assets' ) );
+		add_action( 'wp_head', array( $this, 'output_css'), 90 );
 		add_action( 'wp_footer', array( $this, 'output_html' ) );
 	}
 
@@ -99,13 +112,20 @@ class Bar {
 
 		// subscribe email to selected list
 		$api = mc4wp_get_api();
-		$merge_vars = apply_filters( 'mctp_merge_vars', array() );
-		$email_type = apply_filters( 'mctp_email_type', 'html' );
+		$merge_vars = apply_filters( 'mctb_merge_vars', array() );
+		$email_type = apply_filters( 'mctb_email_type', 'html' );
 
 		$result = $api->subscribe( $this->options['list'], $email, $merge_vars, $email_type, $this->options['double_optin'] );
-		do_action( 'mc4wp_subscribe', $email, $this->options['list'], $merge_vars, $result, 'form', 'top-bar' );
 
-		return $result;
+		do_action( 'mc4wp_subscribe', $email, $this->options['list'], $merge_vars, ( $result === true ), 'form', 'top-bar' );
+
+		// return true if success..
+		if( $result === true ) {
+			return true;
+		}
+
+		$this->error_type = $result;
+		return false;
 	}
 
 	/**
@@ -114,8 +134,14 @@ class Bar {
 	 */
 	private function validate() {
 
-		// make sure `url` field is not changed (honeypot)
-		if( isset( $_POST['url'] ) && 'http://' !== $_POST['url'] ) {
+		// make sure `email_confirm` field is given but not filled (honeypot)
+		if( ! isset( $_POST['email_confirm'] ) || '' !== $_POST['email_confirm'] ) {
+			$this->error_type = 'spam';
+			return false;
+		}
+
+		// make sure `_mctb_token` is given and valid
+		if( ! isset( $_POST['_mctb_token' ] ) || '' === $_POST['_mctb_token'] || ( isset( $_SERVER['REQUEST_URI'] ) && intval( $_POST['_mctb_token'] ) !== strlen( $_SERVER['REQUEST_URI'] ) ) ) {
 			$this->error_type = 'spam';
 			return false;
 		}
@@ -173,13 +199,39 @@ class Bar {
 
 		// add class when bar is sticky
 		if( $this->options['sticky'] ) {
-			$classes[] = 'mctp-sticky';
+			$classes[] = 'mctb-sticky';
 		}
 
 		// add class describing size of the bar
-		$classes[] = "mctp-{$this->options['size']}";
+		$classes[] = "mctb-{$this->options['size']}";
 
 		return join( ' ', $classes );
+	}
+
+	/**
+	 * Output the CSS settings for the bar
+	 */
+	public function output_css() {
+		echo '<style type="text/css">';
+
+		if( '' !== $this->options['color_bar'] ) {
+			echo "#mailchimp-top-bar .mctb-bar, .mctb-response { background: {$this->options['color_bar']}; }";
+		}
+
+		if( '' !== $this->options['color_text'] ) {
+			echo "#mailchimp-top-bar label { color: {$this->options['color_text']}; }";
+		}
+
+		if( '' !== $this->options['color_button'] ) {
+			echo "#mailchimp-top-bar .mctb-button { background: {$this->options['color_button']}; border-color: {$this->options['color_button']}; }";
+			echo "#mailchimp-top-bar .mctb-email:focus { border-color: {$this->options['color_button']}; }";
+		}
+
+		if( '' !== $this->options['color_button_text'] ) {
+			echo "#mailchimp-top-bar .mctb-button { color: {$this->options['color_button_text']}; }";
+		}
+
+		echo '</style>';
 	}
 
 
@@ -188,48 +240,40 @@ class Bar {
 	 */
 	public function output_html() {
 
-		?><style type="text/css"><?php
-
-			if( '' !== $this->options['color_bar'] ) {
-				echo "#mailchimp-top-bar .mctp-bar{ background: {$this->options['color_bar']}; }";
-			}
-
-			if( '' !== $this->options['color_text'] ) {
-				echo "#mailchimp-top-bar label { color: {$this->options['color_text']}; }";
-			}
-
-			if( '' !== $this->options['color_button'] ) {
-				echo "#mailchimp-top-bar .mctp-button { background: {$this->options['color_button']}; border-color: {$this->options['color_button']}; }";
-				echo "#mailchimp-top-bar .mctp-email:focus { border-color: {$this->options['color_button']}; }";
-			}
-
-			if( '' !== $this->options['color_button_text'] ) {
-				echo "#mailchimp-top-bar .mctp-button { color: {$this->options['color_button_text']}; }";
-			}
-
-			?></style>
-		<div id="mailchimp-top-bar" class="<?php echo $this->get_css_class(); ?>">
+		?><div id="mailchimp-top-bar" class="<?php echo $this->get_css_class(); ?>">
 			<!-- MailChimp Top Bar v<?php echo Plugin::VERSION; ?> - https://wordpress.org/plugins/mailchimp-top-bar/ -->
-			<div class="mctp-bar" style="display: none">
+			<div class="mctb-bar" style="display: none">
+				<?php echo $this->get_response_message(); ?>
 				<form method="post">
-					<?php
-					if( $this->submitted ) {
-						 if( $this->success ) {
-							 echo '<label>' . $this->options['text_success'] . '</label>';
-						 } else if( $this->error_type === 'invalid_email' ) {
-							 echo '<label>' . $this->options['text_invalid_email'] . '</label>';
-						 } else {
-							 echo '<label>' . $this->options['text_error'] . '</label>';
-						 }
-					 } else { ?>
-						<label><?php echo strip_tags( $this->options['text_bar'], '<strong><em><u>' ); ?></label>
-						<input type="email" name="email" placeholder="<?php echo esc_attr( $this->options['text_email_placeholder'] ); ?>" class="mctp-email"  />
-						<input type="text"  name="url" placeholder="Your website.." value="http://" class="mctp-url" />
-						<input type="submit" value="<?php echo esc_attr( $this->options['text_button'] ); ?>" class="mctp-button" />
-						<input type="hidden" name="_mctb" value="1" />
-					<?php } ?>
+					<label><?php echo strip_tags( $this->options['text_bar'], '<strong><em><u>' ); ?></label>
+					<input type="email" name="email" placeholder="<?php echo esc_attr( $this->options['text_email_placeholder'] ); ?>" class="mctb-email"  />
+					<input type="text"  name="email_confirm" placeholder="Confirm your email" value="" class="mctb-email-confirm" />
+					<input type="submit" value="<?php echo esc_attr( $this->options['text_button'] ); ?>" class="mctb-button" />
+					<input type="hidden" name="_mctb" value="1" />
 				</form>
-			</div><span class="mctp-close">&#x25BC;</span><!-- / MailChimp Top Bar --></div><?php
+			</div><span class="mctb-close">&#x25BC;</span><!-- / MailChimp Top Bar --></div><?php
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function get_response_message() {
+
+		if( ! $this->submitted ) {
+			return '';
+		}
+
+		if( $this->success ) {
+			$message = $this->options['text_success'];
+		} else if( $this->error_type === 'already_subscribed' ) {
+			$message = $this->options['text_already_subscribed'];
+		} else if( $this->error_type === 'invalid_email' ) {
+			$message = $this->options['text_invalid_email'];
+		} else {
+			$message = $this->options['text_error'];
+		}
+
+		return sprintf( '<div class="mctb-response"><label>%s</label></div>', $message );
 	}
 
 	/**

@@ -1,23 +1,43 @@
 (function($) {
 
-	var $body = $("body");
+	var bodyEl = document.body;
+	var $body = $(bodyEl);
 
 	/**
 	 * Creates a new Top Bar from an element
 	 *
-	 * @param $wrapper
+	 * @param wrapperEl
 	 * @param config
 	 * @returns {{$element: *, toggle: toggle, show: show, hide: hide}}
 	 * @constructor
 	 */
-	var Bar = function( $wrapper, config ) {
+	var Bar = function( wrapperEl, config ) {
 
 		// Vars & State
-		var $bar = $wrapper.find('.mctp-bar');
-		var $icon = $wrapper.find('.mctp-close');
+		var barEl = wrapperEl.querySelector('.mctb-bar');
+		var iconEl = wrapperEl.querySelector('.mctb-close');
 		var visible = false;
+		var $bar = $(barEl);
+		var $icon = $(iconEl);
 
 		// Functions
+
+		function init() {
+
+			// add token field 1 second after initializign the bar
+			window.setTimeout(addTokenField, 1000);
+
+			// fade response 3 seconds after showing bar
+			window.setTimeout(fadeResponse, 3000);
+
+			// Show the bar straight away?
+			if( readCookie( "mctb_bar_hidden" ) != 1 ) {
+				show()
+			}
+
+			// Listen to `click` events on the icon
+			$icon.click( toggle );
+		}
 
 		/**
 		 * Show the bar
@@ -25,23 +45,24 @@
 		 * @returns {boolean}
 		 */
 		function show( manual ) {
-			if( $bar.is( ':animated' ) || visible ) {
+
+			if( visible || $bar.is( ':animated' ) ) {
 				return false;
 			}
 
 			if( manual ) {
 				// Add bar height to <body> padding
-				var bodyPadding = parseFloat( $("body").css('padding-top') ) + $bar.outerHeight();
+				var bodyPadding = ( ( parseInt( bodyEl.style.paddingTop )  || 0 ) + $bar.outerHeight() ) + "px";
 				$body.animate({ 'padding-top': bodyPadding });
 				$bar.slideDown();
 				eraseCookie( 'mctb_bar_hidden' );
 			} else {
 				// Add bar height to <body> padding
-				$body.css( 'padding-top', parseFloat( $("body").css('padding-top') ) + $bar.outerHeight() );
-				$bar.show();
+				barEl.style.display = 'block';
+				bodyEl.style.paddingTop = ( ( parseInt( bodyEl.style.paddingTop )  || 0 ) + $bar.outerHeight() ) + "px";
 			}
 
-			$icon.html(config.icons.hide);
+			iconEl.innerHTML = config.icons.hide;
 			visible = true;
 
 			return true;
@@ -53,7 +74,7 @@
 		 * @returns {boolean}
 		 */
 		function hide(manual) {
-			if( $bar.is( ':animated' ) || ! visible ) {
+			if( ! visible || $bar.is( ':animated' ) ) {
 				return false;
 			}
 
@@ -62,14 +83,35 @@
 				$body.animate({ 'padding-top': 0 });
 				createCookie( "mctb_bar_hidden", 1, config.cookieLength );
 			} else {
-				$bar.hide();
-				$body.css('padding-top', 0);
+				barEl.style.display = 'none';
+				document.body.style.paddingTop = 0;
 			}
 
 			visible = false;
-			$icon.html(config.icons.show);
+			iconEl.innerHTML = config.icons.show;
 
 			return true;
+		}
+
+		/**
+		 * Adds a timestamp field to prevent bots from submitting instantly
+		 */
+		function addTokenField() {
+			var tokenEl = document.createElement('input');
+			tokenEl.setAttribute('name', '_mctb_token');
+			tokenEl.setAttribute('type', 'hidden');
+			tokenEl.setAttribute('value', window.location.pathname.length.toString() );
+			barEl.querySelector('form').appendChild(tokenEl);
+		}
+
+		/**
+		 * Fade out the response message
+		 */
+		function fadeResponse() {
+			var responseEl = wrapperEl.querySelector('.mctb-response');
+			if( responseEl ) {
+				 $(responseEl).fadeOut();
+			}
 		}
 
 		/**
@@ -82,19 +124,11 @@
 		}
 
 		// Code to run upon object instantiation
-
-		// Show the bar straight away?
-		if( readCookie( "mctb_bar_hidden" ) != 1 ) {
-			show()
-		}
-
-
-		// Listen to `click` events on the icon
-		$icon.click( toggle );
+		init();
 
 		// Return values
 		return {
-			$element: $wrapper,
+			element: wrapperEl,
 			toggle: toggle,
 			show: show,
 			hide: hide
@@ -104,7 +138,7 @@
 
 	// Init Bar on window.load
 	$(window).load( function() {
-		window.MailChimpTopBar = new Bar( $(document.getElementById('mailchimp-top-bar') ), window.mctb );
+		window.MailChimpTopBar = new Bar( document.getElementById('mailchimp-top-bar'), window.mctb );
 	});
 
 	/**
