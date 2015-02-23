@@ -21,8 +21,8 @@
 	}
 
 	.mctb-close {
+		top: ($base_size * 1.25);
 		font-size: $base_size * 4;
-		top: $base_size;
 	}
 }
 
@@ -37,9 +37,8 @@ body {
 	left: 0; right: 0;
 	width: 100%;
 	margin: 0;
-	z-index: 1000;
+	z-index: 999999;
 	background: transparent;
-	display: table;
 	text-align: center;
 
 	&.mctb-sticky {
@@ -66,7 +65,7 @@ body {
 	
 	input,
 	label {
-		display: inline-block;
+		display: inline-block !important;
 		vertical-align: middle !important;
 	}
 
@@ -112,7 +111,6 @@ body {
 		opacity: 0.5;
 		filter: alpha(opacity=50);
 		cursor: pointer;
-		display: table-cell;
 		vertical-align: middle;
 	}
 
