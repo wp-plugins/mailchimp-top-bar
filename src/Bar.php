@@ -121,10 +121,11 @@ class Bar {
 		$api = mc4wp_get_api();
 		$merge_vars = apply_filters( 'mctb_merge_vars', array() );
 		$email_type = apply_filters( 'mctb_email_type', 'html' );
+		$mailchimp_list = apply_filters( 'mctb_mailchimp_list', $this->options->get( 'list' ) );
 
-		$result = $api->subscribe( $this->options->get( 'list' ), $email, $merge_vars, $email_type, $this->options->get( 'double_optin' ) );
+		$result = $api->subscribe( $mailchimp_list, $email, $merge_vars, $email_type, $this->options->get( 'double_optin' ) );
 
-		do_action( 'mc4wp_subscribe', $email, $this->options->get( 'list' ), $merge_vars, ( $result === true ), 'form', 'top-bar' );
+		do_action( 'mc4wp_subscribe', $email, $mailchimp_list, $merge_vars, ( $result === true ), 'form', 'top-bar' );
 
 		// return true if success..
 		if( $result ) {
@@ -190,14 +191,17 @@ class Bar {
 	public function load_assets() {
 		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 		wp_enqueue_style( 'mailchimp-top-bar', $this->asset_url( "/css/bar{$min}.css" ), array(), Plugin::VERSION );
-		wp_enqueue_script( 'mailchimp-top-bar', $this->asset_url( "/js/bar{$min}.js" ), array( 'jquery' ), Plugin::VERSION, true );
+		wp_enqueue_script( 'mailchimp-top-bar', $this->asset_url( "/js/bar{$min}.js" ), array(), Plugin::VERSION, true );
+
+		$bottom = ( $this->options->get( 'position' ) === 'bottom' );
 
 		$data = array(
 			'cookieLength' => $this->options->get('cookie_length'),
 			'icons' => array(
-				'hide' => '&#x25B2;',
-				'show' => '&#x25BC;'
-			)
+				'hide' => ( $bottom ) ? '&#x25BC;' : '&#x25B2;',
+				'show' =>  ( $bottom ) ? '&#x25B2;' : '&#x25BC;'
+			),
+			'position' => $this->options->get( 'position' )
 		);
 
 		/**
@@ -217,11 +221,16 @@ class Bar {
 	 * @return string
 	 */
 	private function get_css_class() {
-		$classes = array( '' );
+		$classes = array();
 
 		// add class when bar is sticky
 		if( $this->options->get( 'sticky' ) ) {
 			$classes[] = 'mctb-sticky';
+		}
+
+		// add unique css class for position (bottom|top)
+		if( $this->options->get( 'position' ) ) {
+			$classes[] = sprintf( 'mctb-position-%s', $this->options->get( 'position' ) );
 		}
 
 		// add class describing size of the bar
@@ -275,7 +284,7 @@ class Bar {
 					<input type="hidden" name="_mctb_no_js" value="1" />
 					<input type="hidden" name="_mctb_timestamp" value="<?php echo time(); ?>" />
 				</form>
-			</div><span class="mctb-close">&#x25BC;</span><!-- / MailChimp Top Bar --></div><?php
+			</div><span class="mctb-close"></span><!-- / MailChimp Top Bar --></div><?php
 	}
 
 	/**

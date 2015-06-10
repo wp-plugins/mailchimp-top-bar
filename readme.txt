@@ -1,10 +1,10 @@
 === MailChimp Top Bar ===
-Contributors: DvanKooten, iMazed
-Donate link: https://dannyvankooten.com/donate/
+Contributors: ibericode, DvanKooten, iMazed, hchouhan
+Donate link: https://mc4wp.com/#utm_source=wp-plugin-repo&utm_medium=mailchimp-top-bar&utm_campaign=donate-link
 Tags: mailchimp,form,newsletter,mailchimp form,mailchimp sign-up,email,top bar,opt-in,sign-up,subscribe,conversion,call to action
 Requires at least: 3.8
-Tested up to: 4.2.1
-Stable tag: 1.0.8
+Tested up to: 4.2.2
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,28 +16,29 @@ Adds a beautiful, customizable opt-in bar to the top of your WordPress site. Thi
 increase your MailChimp subscribers.
 
 > This plugin is an add-on for the [MailChimp for WordPress plugin](https://wordpress.org/plugins/mailchimp-for-wp/).
-> To use it, you need at least **MailChimp for WordPress v2.2.3** or **MailChimp for WordPress Premium v2.5.5**.
+> To use it, you need at least **MailChimp for WordPress v2.2.3** or **MailChimp for WordPress Pro v2.5.5**.
 
 = MailChimp Top Bar, at a glance.. =
 
-MailChimp Top Bar adds a simple yet beautiful and customizable opt-in bar to the top of your WordPress site.
+MailChimp Top Bar adds a simple yet beautiful and customizable opt-in bar to the top or bottom of your WordPress site.
 
 Using this bar, people can subscribe to any MailChimp list of your choice.
 
 - A real conversion booster.
 - Unobtrusive, visitors can dismiss the bar.
 - Easy to install & configure, just select a MailChimp list and you're good to.
-- Customizable, you can edit the top bar text and colors from the plugin settings.
+- Customizable, you can edit the bar text and colors from the plugin settings.
+- The bar can be at the top or bottom of the visitor's screen
 - Lightweight, this plugin aims to do one thing, and does it well.
 
 = Development of MailChimp Top Bar =
 
-Bug reports (and Pull Requests) for [MailChimp Top Bar are welcomed on GitHub](https://github.com/dannyvankooten/wp-mailchimp-top-bar). Please note that GitHub is _not_ a support forum.
+Bug reports (and Pull Requests) for [MailChimp Top Bar are welcomed on GitHub](https://github.com/ibericode/mailchimp-top-bar). Please note that GitHub is _not_ a support forum.
 
 **More information**
 
 - [MailChimp for WordPress](https://wordpress.org/plugins/mailchimp-for-wp/)
-- Developers; follow or contribute to the [MailChimp Top Bar plugin on GitHub](https://github.com/dannyvankooten/wp-mailchimp-top-bar)
+- Developers; follow or contribute to the [MailChimp Top Bar plugin on GitHub](https://github.com/ibericode/mailchimp-top-bar)
 - Other [WordPress plugins](https://dannyvankooten.com/wordpress-plugins/#utm_source=wp-plugin-repo&utm_medium=link&utm_campaign=more-info-link) by [Danny van Kooten](https://dannyvankooten.com#utm_source=wp-plugin-repo&utm_medium=link&utm_campaign=more-info-link)
 - [@DannyvanKooten](https://twitter.com/dannyvankooten) on Twitter
 
@@ -80,7 +81,7 @@ Have a look at the [Conditional Tags](https://codex.wordpress.org/Conditional_Ta
 
 = I think I found a bug. What now? =
 
-Please report it on [GitHub issues](https://github.com/dannyvankooten/wp-mailchimp-top-bar/issues) if it's not in the list of known issues.
+Please report it on [GitHub issues](https://github.com/ibericode/mailchimp-top-bar/issues) if it's not in the list of known issues.
 
 = I have another question =
 
@@ -89,10 +90,22 @@ Please open a topic on the [WordPress.org plugin support forums](https://wordpre
 
 == Screenshots ==
 
-1. The MailChimp Top Bar in action on the [MailChimp for WordPress site](https://mc4wp.com).
+1. The MailChimp Top Bar in action on the [MailChimp for WordPress site](https://mc4wp.com/#utm_source=wp-plugin-repo&utm_medium=mailchimp-top-bar&utm_campaign=screenshots).
 2. The settings page of the MailChimp Top Bar plugin.
 
 == Changelog ==
+
+= 1.1 - June 10, 2015 =
+
+**Improvements**
+
+- Bar no longer requires jQuery script, saving an additional HTTP request and 100kb
+
+**Additions**
+
+- Position option: top or bottom
+- New filter: `mctb_mailchimp_list` (set lists to subscribe to)
+- Lithuanian translation, thanks to [Aleksandr Charkov](https://github.com/dec0n)
 
 = 1.0.8 - May 6, 2015 =
 

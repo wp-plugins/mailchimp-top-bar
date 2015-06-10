@@ -33,6 +33,11 @@ class DependencyCheck {
 			return true;
 		}
 
+		// check for MailChimp for WordPress core
+		if( defined( 'MC4WP_VERSION' ) && version_compare( MC4WP_VERSION, '3.0', '>=' ) ) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -57,7 +62,7 @@ class DependencyCheck {
 	public function admin_notice() {
 		?>
 		<div class="updated">
-			<p><?php printf( __( 'Please install <a href="%s">%s</a> in order to use %s.', 'mailchimp-sync' ), 'https://wordpress.org/plugins/mailchimp-for-wp/', 'MailChimp for WordPress', 'MailChimp Top Bar' ); ?></p>
+			<p><?php printf( __( 'Please install or update <a href="%s">%s</a> in order to use %s.', 'mailchimp-top-bar' ), 'https://wordpress.org/plugins/mailchimp-for-wp/', 'MailChimp for WordPress', 'MailChimp Top Bar' ); ?></p>
 		</div>
 		<?php
 	}

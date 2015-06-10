@@ -1,7 +1,7 @@
-(function($) {
+(function() {
 
 	var bodyEl = document.body;
-	var $body = $(bodyEl);
+	var $ = window.jQuery;
 
 	/**
 	 * Creates a new Top Bar from an element
@@ -17,8 +17,9 @@
 		var barEl = wrapperEl.querySelector('.mctb-bar');
 		var iconEl = wrapperEl.querySelector('.mctb-close');
 		var visible = false;
-		var $bar = $(barEl);
-		var $icon = $(iconEl);
+		var originalBodyPadding = 0,
+			barHeight = 0,
+			bodyCSS = {};
 
 		// Functions
 
@@ -28,18 +29,37 @@
 			var noJsField = barEl.querySelector('input[name="_mctb_no_js"]');
 			noJsField.parentElement.removeChild(noJsField);
 
-			iconEl.style.display = 'block';
+			// calculate real bar height
+			var origBarPosition = barEl.style.position;
+			barEl.style.display = 'block';
+			barEl.style.position = 'relative';
+			barHeight = barEl.clientHeight;
+			wrapperEl.style.height = barHeight + "px";
+			barEl.style.display = 'none';
+			barEl.style.position = origBarPosition;
+
+			// save original bodyPadding
+			if( config.position === 'bottom' ) {
+				originalBodyPadding = ( parseInt( bodyEl.style.paddingBottom )  || 0 );
+			} else {
+				originalBodyPadding = ( parseInt( bodyEl.style.paddingTop )  || 0 );
+			}
+
+			// get real bar hegiht (if it were shown)
+			bodyPadding = ( originalBodyPadding + barHeight ) + "px";
 
 			// fade response 3 seconds after showing bar
 			window.setTimeout(fadeResponse, 3000);
+
+			// Configure icon
+			iconEl.innerHTML = config.icons.show;
+			iconEl.style.display = 'block';
+			addEvent(iconEl, 'click', toggle);
 
 			// Show the bar straight away?
 			if( readCookie( "mctb_bar_hidden" ) != 1 ) {
 				show()
 			}
-
-			// Listen to `click` events on the icon
-			$icon.click( toggle );
 		}
 
 		/**
@@ -49,20 +69,32 @@
 		 */
 		function show( manual ) {
 
-			if( visible || $bar.is( ':animated' ) ) {
+			if( visible ) {
 				return false;
 			}
 
 			if( manual ) {
-				// Add bar height to <body> padding
-				var bodyPadding = ( ( parseInt( bodyEl.style.paddingTop )  || 0 ) + $bar.outerHeight() ) + "px";
-				$body.animate({ 'padding-top': bodyPadding });
-				$bar.slideDown();
 				eraseCookie( 'mctb_bar_hidden' );
+			}
+
+			// use animation if jQuery is loaded
+			if( manual && typeof($) === "function" ){
+				$(barEl).slideDown(300);
+
+				// animate body padding
+				if( config.position === 'bottom' ) {
+					$(bodyEl).animate({
+						'padding-bottom': bodyPadding
+					});
+				} else {
+					$(bodyEl).animate({
+						'padding-top': bodyPadding
+					});
+				}
 			} else {
 				// Add bar height to <body> padding
 				barEl.style.display = 'block';
-				bodyEl.style.paddingTop = ( ( parseInt( bodyEl.style.paddingTop )  || 0 ) + $bar.outerHeight() ) + "px";
+				bodyEl.style.marginTop = bodyPadding;
 			}
 
 			iconEl.innerHTML = config.icons.hide;
@@ -77,17 +109,26 @@
 		 * @returns {boolean}
 		 */
 		function hide(manual) {
-			if( ! visible || $bar.is( ':animated' ) ) {
+			if( ! visible ) {
 				return false;
 			}
 
 			if( manual ) {
-				$bar.slideUp();
-				$body.animate({ 'padding-top': 0 });
 				createCookie( "mctb_bar_hidden", 1, config.cookieLength );
+			}
+
+			if( manual && typeof($) === "function" ){
+				$(barEl).slideUp(300);
+
+				// animate body padding
+				if( config.position === 'bottom' ) {
+					$(bodyEl).animate({ 'padding-bottom': originalBodyPadding + "px" });
+				} else {
+					$(bodyEl).animate({ 'padding-top': originalBodyPadding +"px" });
+				}
 			} else {
 				barEl.style.display = 'none';
-				document.body.style.paddingTop = 0;
+				document.body.style.paddingTop = originalBodyPadding + "px";
 			}
 
 			visible = false;
@@ -97,28 +138,11 @@
 		}
 
 		/**
-		 * Adds a timestamp field to prevent bots from submitting instantly
-		 */
-		function addTokenField() {
-
-			var pathname = window.location.pathname;
-			var token = (pathname.length * 11).toString() + (pathname.split('/').length * 111).toString();
-
-			var tokenEl = document.createElement('input');
-			tokenEl.setAttribute('name', '_mctb_token');
-			tokenEl.setAttribute('type', 'hidden');
-			tokenEl.setAttribute('value', token );
-			barEl.querySelector('form').appendChild(tokenEl);
-		}
-
-		/**
 		 * Fade out the response message
 		 */
 		function fadeResponse() {
 			var responseEl = wrapperEl.querySelector('.mctb-response');
-			if( responseEl ) {
-				 $(responseEl).fadeOut();
-			}
+			responseEl && fadeOut(responseEl);
 		}
 
 		/**
@@ -144,9 +168,72 @@
 	};
 
 	// Init bar
-	$(document).ready( function() {
+	ready( function() {
 		window.MailChimpTopBar = new Bar( document.getElementById('mailchimp-top-bar'), window.mctb );
 	});
+
+	/**
+	 * DOMContentLoaded (IE8 compatible)
+	 *
+	 * @param fn
+	 */
+	function ready(fn) {
+		if (document.readyState != 'loading'){
+			fn();
+		} else if (document.addEventListener) {
+			document.addEventListener('DOMContentLoaded', fn);
+		} else {
+			document.attachEvent('onreadystatechange', function() {
+				if (document.readyState != 'loading')
+					fn();
+			});
+		}
+	}
+
+	/**
+	 * Add event (IE8 compatible)
+	 *
+	 * @param element
+	 * @param eventName
+	 * @param callback
+	 */
+	function addEvent(element, eventName, callback) {
+		if (element.addEventListener) {
+			return element.addEventListener(eventName, callback, false);
+		} else if (element.attachEvent)  {
+			return element.attachEvent('on' + eventName, callback);
+		}
+	}
+
+	/**
+	 * Fades out the given element
+	 *
+	 * @param element
+	 */
+	function fadeOut(element) {
+		var opacity = 1;
+
+		function fadeStep() {
+
+			if (opacity <= 0.1){
+				element.style.display = 'none';
+				return false;
+			}
+
+			element.style.opacity = opacity;
+			opacity -= opacity * 0.1;
+
+			if( typeof( window.requestAnimationFrame ) === "function" ) {
+				window.requestAnimationFrame(fadeStep);
+			} else {
+				window.setTimeout(fadeStep, 25);
+			}
+
+			return true;
+		}
+
+		fadeStep();
+	}
 
 	/**
 	 * Creates a cookie
@@ -194,4 +281,4 @@
 		createCookie(name, "", -1);
 	}
 
-})(window.jQuery);
+})();
