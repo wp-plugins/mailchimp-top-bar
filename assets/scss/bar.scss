@@ -1,0 +1,155 @@
+// Calculates paddings * heights for the various bar sizes
+@mixin bar-size( $base_size ) {
+
+	font-size: $base_size * 2.5;
+
+	.mctb-bar {
+		padding: ($base_size * 1.25) ($base_size * 1.5);
+	}
+
+	.mctb-button {
+		padding: $base_size ($base_size * 3);
+	}
+
+	input,
+	label {
+		padding: $base_size ($base_size * 1.5);
+	}
+
+	label {
+		font-size: $base_size * 3;
+	}
+
+	.mctb-close {
+		top: ($base_size * 1.25);
+		font-size: $base_size * 4;
+	}
+}
+
+body {
+	position: relative;
+}
+
+#mailchimp-top-bar {
+
+	position: absolute;
+	top: 0;
+	left: 0; right: 0;
+	width: 100%;
+	margin: 0;
+	z-index: 999999;
+	background: transparent;
+	text-align: center;
+
+	&.mctb-sticky {
+		position: fixed;
+	}
+
+	&.mctb-position-bottom {
+		position: fixed;
+		bottom: 0;
+		top: auto;
+
+		.mctb-bar {
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+		}
+	}
+
+	// Reset Form elements, many themes apply basic styling
+	form,
+	input,
+	label {
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		vertical-align: middle;
+		margin: 0;
+		padding: 0;
+		box-shadow: none;
+		text-shadow: none;
+		font-size: 100%;
+		outline: 0;
+		height: auto;
+		line-height: initial;
+		float: none;
+	}
+	
+	input,
+	label {
+		display: inline-block !important;
+		vertical-align: middle !important;
+		width: auto !important;
+	}
+
+	form{
+		text-align: center;
+		margin: 0 !important;
+	}
+
+	// Make label & field appear inline
+	label {
+		margin: 0 6px 0 0 !important;
+	}
+
+	input{
+		margin: 0 0 0 6px !important;
+		border: 1px solid white;
+		background: white;
+	}
+
+	.mctb-email {
+		width: 240px !important;
+	}
+
+	.mctb-button {
+		cursor: pointer;
+	}
+
+	.mctb-email-confirm {
+		display: none !important;
+	}
+
+	.mctb-response {
+		position: absolute;
+		left: 0;
+		right: 0;
+	}
+
+	.mctb-close{
+		position: absolute;
+		top: 0;
+		right: 12px;
+		color: #666;
+		opacity: 0.5;
+		filter: alpha(opacity=50);
+		cursor: pointer;
+		vertical-align: middle;
+	}
+
+	.mctb-close:hover {
+		opacity: 1;
+		filter: alpha(opacity=100);
+	}
+
+
+	/**
+	* Bar Sizes
+	*/
+
+	// Small Bar
+	&.mctb-small {
+		@include bar-size(4px);
+	}
+
+	// Medium Bar
+	&.mctb-medium {
+		@include bar-size(5px);
+	}
+
+	// Big Bar
+	&.mctb-big {
+		@include bar-size(6px);
+	}
+}
