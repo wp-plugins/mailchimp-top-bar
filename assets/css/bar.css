@@ -37,19 +37,36 @@ body {
 .mctb label {
   display: inline-block !important;
   vertical-align: middle !important;
-  width: auto !important;
+  width: auto;
 }
 .mctb form {
   text-align: center;
   margin: 0 !important;
+  padding: 0 !important;
 }
 .mctb label {
   margin: 0 6px 0 0 !important;
 }
-.mctb input {
+.mctb input,
+.mctb input[type="text"],
+.mctb input[type="email"],
+.mctb input[type="submit"],
+.mctb .mctb-email,
+.mctb .mctb-button {
   margin: 0 0 0 6px !important;
   border: 1px solid white;
   background: white;
+  height: auto;
+}
+.mctb .mctb-email {
+  width: 100%;
+  max-width: 240px !important;
+}
+.mctb .mctb-button {
+  cursor: pointer;
+}
+.mctb .mctb-email-confirm {
+  display: none !important;
 }
 .mctb.mctb-small {
   font-size: 10px;
@@ -62,13 +79,12 @@ body {
 }
 .mctb.mctb-small input,
 .mctb.mctb-small label {
-  padding: 4px 6px;
+  padding: 4px 6px !important;
 }
 .mctb.mctb-small label {
   font-size: 12px;
 }
 .mctb.mctb-small .mctb-close {
-  top: 5px;
   font-size: 16px;
 }
 .mctb.mctb-medium {
@@ -82,13 +98,12 @@ body {
 }
 .mctb.mctb-medium input,
 .mctb.mctb-medium label {
-  padding: 5px 7.5px;
+  padding: 5px 7.5px !important;
 }
 .mctb.mctb-medium label {
   font-size: 15px;
 }
 .mctb.mctb-medium .mctb-close {
-  top: 6.25px;
   font-size: 20px;
 }
 .mctb.mctb-big {
@@ -102,13 +117,12 @@ body {
 }
 .mctb.mctb-big input,
 .mctb.mctb-big label {
-  padding: 6px 9px;
+  padding: 6px 9px !important;
 }
 .mctb.mctb-big label {
   font-size: 18px;
 }
 .mctb.mctb-big .mctb-close {
-  top: 7.5px;
   font-size: 24px;
 }
 
@@ -128,22 +142,12 @@ body {
   bottom: 0;
 }
 
-.mctb-email {
-  max-width: 240px !important;
-}
-
-.mctb-button {
-  cursor: pointer;
-}
-
-input.mctb-email-confirm {
-  display: none !important;
-}
-
 .mctb-response {
   position: absolute;
   left: 0;
   right: 0;
+  top: 0;
+  bottom: 0;
 }
 
 .mctb-close {

@@ -13,7 +13,7 @@
 
 	input,
 	label {
-		padding: $base_size ($base_size * 1.5);
+		padding: $base_size ($base_size * 1.5) !important;
 	}
 
 	label {
@@ -21,7 +21,6 @@
 	}
 
 	.mctb-close {
-		top: ($base_size * 1.25);
 		font-size: $base_size * 4;
 	}
 }
@@ -64,12 +63,13 @@ body {
 	label {
 		display: inline-block !important;
 		vertical-align: middle !important;
-		width: auto !important;
+		width: auto;
 	}
 
 	form{
 		text-align: center;
 		margin: 0 !important;
+		padding: 0 !important;
 	}
 
 	// Make label & field appear inline
@@ -77,10 +77,29 @@ body {
 		margin: 0 6px 0 0 !important;
 	}
 
-	input{
+	input,
+	input[type="text"],
+	input[type="email"],
+	input[type="submit"],
+	.mctb-email,
+	.mctb-button{
 		margin: 0 0 0 6px !important;
 		border: 1px solid white;
 		background: white;
+		height: auto;
+	}
+
+	.mctb-email {
+		width: 100%;
+		max-width: 240px !important;
+	}
+
+	.mctb-button {
+		cursor: pointer;
+	}
+
+	.mctb-email-confirm {
+		display: none !important;
 	}
 
 	/**
@@ -120,22 +139,12 @@ body {
 	}
 }
 
-.mctb-email {
-	max-width: 240px !important;
-}
-
-.mctb-button {
-	cursor: pointer;
-}
-
-input.mctb-email-confirm {
-	display: none !important;
-}
-
 .mctb-response {
 	position: absolute;
 	left: 0;
 	right: 0;
+	top: 0;
+	bottom: 0;
 }
 
 .mctb-close{
