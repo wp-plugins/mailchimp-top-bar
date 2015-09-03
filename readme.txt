@@ -87,7 +87,7 @@ You can use the following CSS to change the appearance of the toggle icon.
 #mailchimp-top-bar .mctb-close { color: red; }
 `
 
-= How to show a Name field in the bar? =
+= How to add a name field to the bar? =
 
 You can use the following code snippet to show a "NAME" field in your bar.
 
@@ -97,7 +97,7 @@ add_action( 'mctb_before_submit_button', function() {
 });
 
 add_filter( 'mctb_merge_vars', function( $vars ) {
-    $vars['NAME'] = ( isset( $_POST['NAME'] ) ) ? $_POST['NAME'] : '';
+    $vars['NAME'] = ( isset( $_POST['NAME'] ) ) ? sanitize_text_field( $_POST['NAME'] ) : '';
     return $vars;
 });
 `
