@@ -12,12 +12,17 @@ class Options {
 	/**
 	 * @var array Array of options, without inherited values
 	 */
-	private $options = array();
+	public $options = array();
 
 	/**
 	 * @var array Array of options with inherited values
 	 */
-	private $inherited_options = array();
+	public $inherited_options = array();
+
+	/**
+	 * @var array
+	 */
+	public $parent_options = array();
 
 	/**
 	 * Constructor
@@ -65,7 +70,10 @@ class Options {
 			'text_button' => __( 'Subscribe', 'mailchimp-top-bar' ),
 			'redirect' => '',
 			'position' => 'top',
+
+			// options which should inherit if empty
 			'double_optin' => '',
+			'send_welcome' => '',
 			'text_subscribed' => '',
 			'text_error' => '',
 			'text_invalid_email' => '',
@@ -87,13 +95,14 @@ class Options {
 	 */
 	private function load_inherited_options() {
 
-		$parent_options = mc4wp_get_options( 'form' );
+		$this->parent_options = mc4wp_get_options( 'form' );
 		$inherited_options = $this->options;
 
 		// specify keys which should inherit if empty
 		$inheritance_keys = array(
 			'redirect',
 			'double_optin',
+			'send_welcome',
 			'text_subscribed',
 			'text_error',
 			'text_invalid_email',
@@ -103,7 +112,7 @@ class Options {
 		// Use parent value if option value is empty
 		foreach( $inheritance_keys as $key ) {
 			if( $inherited_options[ $key ] === '' ) {
-				$inherited_options[ $key ] = $parent_options[ $key ];
+				$inherited_options[ $key ] = $this->parent_options[ $key ];
 			}
 		}
 

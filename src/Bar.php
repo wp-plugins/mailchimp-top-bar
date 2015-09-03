@@ -123,7 +123,7 @@ class Bar {
 		$email_type = apply_filters( 'mctb_email_type', 'html' );
 		$mailchimp_list = apply_filters( 'mctb_mailchimp_list', $this->options->get( 'list' ) );
 
-		$result = $api->subscribe( $mailchimp_list, $email, $merge_vars, $email_type, $this->options->get( 'double_optin' ) );
+		$result = $api->subscribe( $mailchimp_list, $email, $merge_vars, $email_type, $this->options->get( 'double_optin' ), false, true, $this->options->get( 'send_welcome' ) );
 
 		do_action( 'mc4wp_subscribe', $email, $mailchimp_list, $merge_vars, ( $result === true ), 'form', 'top-bar' );
 
@@ -201,7 +201,9 @@ class Bar {
 				'hide' => ( $bottom ) ? '&#x25BC;' : '&#x25B2;',
 				'show' =>  ( $bottom ) ? '&#x25B2;' : '&#x25BC;'
 			),
-			'position' => $this->options->get( 'position' )
+			'position' => $this->options->get( 'position' ),
+			'is_submitted' => $this->submitted,
+			'is_success' => $this->success
 		);
 
 		/**
@@ -215,6 +217,11 @@ class Bar {
 		$data = apply_filters( 'mctb_bar_config', $data );
 
 		wp_localize_script( 'mailchimp-top-bar', 'mctb', $data );
+
+		// enqueue placeholders.js from MailChimp for WordPress core plugin
+		if( isset( $GLOBALS['is_IE'] ) && $GLOBALS['is_IE'] ) {
+			wp_enqueue_script( 'mc4wp-placeholders' );
+		}
 	}
 
 	/**
@@ -271,14 +278,19 @@ class Bar {
 	 */
 	public function output_html() {
 
+		$form_action = apply_filters( 'mctb_form_action', null );
+
 		?><div id="mailchimp-top-bar" class="<?php echo $this->get_css_class(); ?>">
 			<!-- MailChimp Top Bar v<?php echo Plugin::VERSION; ?> - https://wordpress.org/plugins/mailchimp-top-bar/ -->
 			<div class="mctb-bar" style="display: none">
 				<?php echo $this->get_response_message(); ?>
-				<form method="post">
+				<form method="post" <?php if( is_string( $form_action ) ) { printf( 'action="%s"', $form_action ); } ?>>
+					<?php do_action( 'mctb_before_label' ); ?>
 					<label><?php echo $this->options->get( 'text_bar' ); ?></label>
+					<?php do_action( 'mctb_before_email_field' ); ?>
 					<input type="email" name="email" placeholder="<?php echo esc_attr( $this->options->get( 'text_email_placeholder' ) ); ?>" class="mctb-email"  />
 					<input type="text"  name="email_confirm" placeholder="Confirm your email" value="" class="mctb-email-confirm" />
+					<?php do_action( 'mctb_before_submit_button' ); ?>
 					<input type="submit" value="<?php echo esc_attr( $this->options->get('text_button') ); ?>" class="mctb-button" />
 					<input type="hidden" name="_mctb" value="1" />
 					<input type="hidden" name="_mctb_no_js" value="1" />
