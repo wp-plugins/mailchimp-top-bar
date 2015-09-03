@@ -79,14 +79,6 @@ add_filter( 'mctb_show_bar', function( $show ) {
 
 Have a look at the [Conditional Tags](https://codex.wordpress.org/Conditional_Tags) page for all accepted functions.
 
-= How to change the color of the toggle icon? =
-
-You can use the following CSS to change the appearance of the toggle icon.
-
-`
-#mailchimp-top-bar .mctb-close { color: red; }
-`
-
 = How to add a name field to the bar? =
 
 You can use the following code snippet to show a "NAME" field in your bar.
@@ -100,6 +92,14 @@ add_filter( 'mctb_merge_vars', function( $vars ) {
     $vars['NAME'] = ( isset( $_POST['NAME'] ) ) ? sanitize_text_field( $_POST['NAME'] ) : '';
     return $vars;
 });
+`
+
+= How to change the color of the toggle icon? =
+
+You can use the following CSS to change the appearance of the toggle icon.
+
+`
+#mailchimp-top-bar .mctb-close { color: red; }
 `
 
 = I think I found a bug. What now? =
