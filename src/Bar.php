@@ -25,6 +25,11 @@ class Bar {
 	private $submitted = false;
 
 	/**
+	 * @var Tracker
+	 */
+	protected $tracker;
+
+	/**
 	 * Constructor
 	 *
 	 * @param Options $options
@@ -53,6 +58,8 @@ class Bar {
 	 * @return bool
 	 */
 	public function init() {
+
+		$this->tracker = new Tracker( 365 * DAY_IN_SECONDS );
 
 		if( ! $this->should_show_bar() ) {
 			return false;
@@ -131,8 +138,9 @@ class Bar {
 		// return true if success..
 		if( $result ) {
 
-			// set cookie tracking list_id and time
-			setcookie( '_mctb', serialize( array( $mailchimp_list => time() ) ), time() + ( 365 * WEEK_IN_SECONDS ), '/' );
+			// track sign-up attempt
+			$this->tracker->track( $mailchimp_list );
+			$this->tracker->save();
 
 			// should we redirect
 			if( '' !== $this->options->get( 'redirect' ) ) {
@@ -290,7 +298,7 @@ class Bar {
 				<?php echo $this->get_response_message(); ?>
 				<form method="post" <?php if( is_string( $form_action ) ) { printf( 'action="%s"', $form_action ); } ?>>
 					<?php do_action( 'mctb_before_label' ); ?>
-					<label><?php echo $this->options->get( 'text_bar' ); ?></label>
+					<label class="mctb-label"><?php echo $this->options->get( 'text_bar' ); ?></label>
 					<?php do_action( 'mctb_before_email_field' ); ?>
 					<input type="email" name="email" placeholder="<?php echo esc_attr( $this->options->get( 'text_email_placeholder' ) ); ?>" class="mctb-email"  />
 					<input type="text"  name="email_confirm" placeholder="Confirm your email" value="" class="mctb-email-confirm" />
@@ -322,7 +330,7 @@ class Bar {
 			$message = $this->options->get('text_error');
 		}
 
-		return sprintf( '<div class="mctb-response"><label>%s</label></div>', $message );
+		return sprintf( '<div class="mctb-response"><label class="mctb-response-label">%s</label></div>', $message );
 	}
 
 	/**
